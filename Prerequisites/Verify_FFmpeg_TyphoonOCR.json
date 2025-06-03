@@ -1,0 +1,137 @@
+{
+  "name": "Verify FFmpeg TyphoonOCR",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "16209e94-17e3-469b-af8e-d93cc2a58346",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i /data/input.mp4 \\\n-vf \"drawtext=fontfile=/usr/share/fonts/custom/Kanit-Medium.ttf:text='Hi Jaruphat':fontcolor=white:fontsize=64:x=(w-text_w)/2:y=(h/2)-40:box=1:boxcolor=black@0.5:boxborderw=10,\\\ndrawtext=fontfile=/usr/share/fonts/custom/Kanit-Medium.ttf:text='รองรับภาษาไทยนะครับ':fontcolor=white:fontsize=64:x=(w-text_w)/2:y=(h/2)+40:box=1:boxcolor=black@0.5:boxborderw=10\" \\\n-codec:a copy /data/output.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "bbf9486a-60a9-43f0-9d8a-0a14cd1452a9",
+      "name": "FFMpeg"
+    },
+    {
+      "parameters": {
+        "command": "=python -c \"import sys, os; os.environ['TYPHOON_OCR_API_KEY'] = '<YourTyphoonAPI>'; from typhoon_ocr import ocr_document; sys.stdout.reconfigure(encoding='utf-8'); input_path = sys.argv[1]; text = ocr_document(input_path); print(text)\" \"/doc/{{$json[\"fileName\"]}}\"\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        680,
+        0
+      ],
+      "id": "176c6d30-9feb-4074-a3a1-1a7436aff139",
+      "name": "TyphoonOCR"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/doc/*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        500,
+        0
+      ],
+      "id": "2dc87cea-28b6-43bf-89c1-d1d36914d0da",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "content": "## FFMpeg Verify\n1. นำไฟล์ input.mp3 ใส่เข้าไปใน folder /data/\n2. edit ชื่อ font ที่เราได้ใส่เข้าไปใน folder /fonts/\n3. รอดูผล output.mp4 จะถูกสร้างมาใน folder /data/",
+        "height": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        -180
+      ],
+      "typeVersion": 1,
+      "id": "15df0e80-c590-4248-a399-63a116680f22",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Typhoon OCR Verfiy\n1. นำไฟล์เอกสาร.pdf ใส่เข้าไปใน folder /doc/\n2. edit <TyphoonOCR>\n3. รอดู output ว่าสามารถใช้งานได้ปกติ",
+        "height": 400,
+        "width": 440,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        -180
+      ],
+      "typeVersion": 1,
+      "id": "28bb1170-665d-452d-b365-1529ef4f8fb0",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "FFMpeg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFMpeg": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TyphoonOCR": {
+      "main": [
+        []
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "TyphoonOCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98f1a3de-e6a0-4014-9d55-1d5af3b1dba5",
+  "meta": {
+    "instanceId": "dec2dfaf70ee5f196c1183021cac4584d3e5f289775f85e6eb54a94f68f11d9e"
+  },
+  "id": "dxnSAb7UspIZOMrW",
+  "tags": []
+}
