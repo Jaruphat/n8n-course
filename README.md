@@ -10,7 +10,7 @@
 - บทที่ 5: 10 โหนดสำคัญใน n8n ที่ควรรู้จัก (Top 10 Essential Nodes in n8n)											
 - บทที่ 6: การใช้งาน API และ Webhook กับ n8n (Working with APIs & Webhooks)											
 - บทที่ 7: Credential ที่สำคัญและใช้บ่อย (Commonly Used Credentials in n8n)											
-- [บทที่ 8: ตัวอย่าง Workflow และเทมเพลตที่ใช้งานได้จริง (Real-World Use Cases)](/.lesson-08)
+- [บทที่ 8: ตัวอย่าง Workflow และเทมเพลตที่ใช้งานได้จริง (Real-World Use Cases)](https://github.com/Jaruphat/n8n-course/tree/main/lesson-08))
 
-## 📎 Resources
-- [n8n Cheatsheet (PDF)](./resources/n8n-cheatsheet.pdf)
+## 📎 Pre-requisites
+- [N8N Docker Setup with FFmpeg & Typhoon OCR]([./resources/n8n-cheatsheet.pdf](https://github.com/Jaruphat/n8n-course/tree/main/Prerequisites))
