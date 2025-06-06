@@ -1,0 +1,377 @@
+{
+  "name": "lesson-08_3_Extract and Structure Thai Documents to Google Sheets using Typhoon OCR",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b09b985e-c286-4b4f-99e6-a71c7af26b6e",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -180,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "scb10x/llama3.1-typhoon2-8b-instruct",
+        "options": {}
+      },
+      "id": "cbbe6451-353e-4bb7-8f36-27c8d69a0610",
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "position": [
+        380,
+        200
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openRouterApi": {
+          "id": "LbZNXPbtb81Xk64r",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=python -c \"import sys, os; os.environ['TYPHOON_OCR_API_KEY'] = 'sk-0arzXoosKQJUmzahAVNFwTcRdewrCftgRPaWKgOKANyswtod'; from typhoon_ocr import ocr_document; sys.stdout.reconfigure(encoding='utf-8'); input_path = sys.argv[1]; text = ocr_document(input_path); print(text)\" \"/doc/{{$json[\"fileName\"]}}\""
+      },
+      "id": "9d773e4d-40e6-45a2-9012-43ca6922e9b4",
+      "name": "Extract Text with Typhoon OCR",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [
+        200,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ข้อความด้านล่างนี้เป็นเนื้อหา OCR จากหนังสือราชการ กรุณาแยกหัวข้อสำคัญออกมาในรูปแบบ JSON:\n\n1. book_id: เลขที่หนังสือ\n2. date: วันที่ในเอกสาร\n3. subject: หัวเรื่อง\n4. to: เรียน\n5. attach: สิ่งที่ส่งมาด้วย\n6. detail: เนื้อความในหนังสือ\n7. signed_by: ผู้ลงนาม\n8. signed_by2: ตำแหน่งผู้ลงนาม\n9. contact: ช่องทางติดต่อ (เช่น เบอร์โทร อีเมล)\n10. download_url: ลิงก์สำหรับดาวน์โหลด (ถ้ามี)\n\nOCR_TEXT:\n\"\"\"\n{{ $json[\"stdout\"] }}\n\"\"\""
+      },
+      "id": "e5ff1afe-73ab-4bfa-9e50-0e92a9f23a87",
+      "name": "Structure Text to JSON with LLM",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        380,
+        80
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json[\"text\"];\n\n// 1. ลบ ```json และ ``` ที่ LLM อาจใส่มา\nconst cleaned = raw.replace(/```json\\n?|```/g, \"\").trim();\n\nlet parsed;\ntry {\n  // 2. แปลงเป็น object\n  parsed = JSON.parse(cleaned);\n} catch (err) {\n  throw new Error(\"JSON parsing failed: \" + err.message + \"\\n\\nRaw text:\\n\" + cleaned);\n}\n\n// 3. หาก contact เป็น object แยก field ออกมา\nconst contact = parsed.contact || {};\n\nreturn {\n  book_id: parsed.book_id || \"\",\n  date: parsed.date || \"\",\n  subject: parsed.subject || \"\",\n  to: parsed.to || \"\",\n  attach: parsed.attach || \"\",\n  detail: parsed.detail || \"\",\n  signed_by: parsed.signed_by || \"\",\n  signed_by2: parsed.signed_by2 || \"\",\n  contact_phone: contact.phone || \"\",\n  contact_email: contact.email || \"\",\n  contact_fax: contact.fax || \"\",\n  download_url: parsed.download_url || \"\"\n};\n"
+      },
+      "id": "cfad2d07-cd88-4abb-acca-e82a87b949a6",
+      "name": "Parse JSON to Sheet Format",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        720,
+        80
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1h70cJyLj5i2j0Ag5kqp93ccZjjhJnqpLmz-ee5r4brU",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h70cJyLj5i2j0Ag5kqp93ccZjjhJnqpLmz-ee5r4brU/edit?usp=drivesdk",
+          "cachedResultName": "TyphoonOCR_Extracted_Data"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h70cJyLj5i2j0Ag5kqp93ccZjjhJnqpLmz-ee5r4brU/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "value": {
+            "to": "={{ $json.to }}",
+            "date": "={{ $json.date }}",
+            "attach": "={{ $json.attach }}",
+            "detail": "={{ $json.detail }}",
+            "book_id": "={{ $json.book_id }}",
+            "subject": "={{ $json.subject }}",
+            "signed_by": "={{ $json.signed_by }}",
+            "signed_by2": "={{ $json.signed_by2 }}",
+            "contact_fax": "={{ $json.contact_fax }}",
+            "download_url": "={{ $json.download_url }}",
+            "contact_email": "={{ $json.contact_email }}",
+            "contact_phone": "={{ $json.contact_phone }}"
+          },
+          "schema": [
+            {
+              "id": "book_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "book_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "date",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "subject",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "to",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "to",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "attach",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "attach",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detail",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "detail",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "signed_by",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "signed_by",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "signed_by2",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "signed_by2",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_phone",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "contact_phone",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_email",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "contact_email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_fax",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "contact_fax",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "download_url",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "download_url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "book_id"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "054b4edd-c374-4e09-bcec-401f1de1d804",
+      "name": "Save to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        900,
+        80
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/doc/*",
+        "options": {}
+      },
+      "id": "c26c9b14-f635-4ded-8956-57f3e1db3b6f",
+      "name": "Load PDFs from doc Folder",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        0,
+        80
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## Thai OCR to Sheet\nThis workflow extracts Thai PDF text using typhoon-ocr, converts it to structured JSON using LLM, and saves the output to Google Sheets. Works with self-hosted n8n only.",
+        "height": 360,
+        "width": 1320
+      },
+      "id": "3664f86e-dae7-4a49-8249-9d26052a83ca",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        -20
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## [ - Google Sheet Link Click !](https://docs.google.com/spreadsheets/d/1h70cJyLj5i2j0Ag5kqp93ccZjjhJnqpLmz-ee5r4brU/edit?usp=sharing)\n\n## [ - Example PDF Click !](https://drive.google.com/file/d/16QZ2X8H0M-hV3lOCCa20vaPuvfX_5ua8/view?usp=sharing)\n\n### Result\n![Alt text](https://drive.google.com/thumbnail?id=1KhT--nqMg9D-MhyJAK-5l7LO9WeF992r&sz=w1200)",
+        "height": 740,
+        "width": 1320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        360
+      ],
+      "typeVersion": 1,
+      "id": "ddafcd4f-853c-4173-abce-e004274c7da3",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structure Text to JSON with LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load PDFs from doc Folder": {
+      "main": [
+        [
+          {
+            "node": "Extract Text with Typhoon OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON to Sheet Format": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text with Typhoon OCR": {
+      "main": [
+        [
+          {
+            "node": "Structure Text to JSON with LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure Text to JSON with LLM": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON to Sheet Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Load PDFs from doc Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "608af643-0c0c-401f-a2b0-923d88b4c2b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dec2dfaf70ee5f196c1183021cac4584d3e5f289775f85e6eb54a94f68f11d9e"
+  },
+  "id": "AfSZNFb80yojUUQ0",
+  "tags": []
+}

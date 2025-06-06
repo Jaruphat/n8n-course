@@ -1,0 +1,459 @@
+{
+  "name": "lesson-08_4_Extract Thai Bank Slip Data from LINE using SpaceOCR and Save to Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Prepare data\n**- Get content image from Line** \nhttps://api-data.line.me/v2/bot/message/xxx/content\n\n**- Get image URL to Binary**",
+        "height": 500,
+        "width": 400
+      },
+      "id": "80e6bfad-7691-4621-8a8a-20e5f7dca18d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8b8ac7c-5c5f-452f-a84d-e068bb248eb5",
+              "name": "file_url",
+              "type": "string",
+              "value": "=https://api-data.line.me/v2/bot/message/{{ $json.body.events[0].message.id }}/content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5297110f-4d44-455a-aaf3-79565562ec5a",
+      "name": "Image slip URL in Line",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        300,
+        200
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "8bad330a-ea3e-4563-b3d4-9f4220401cd6",
+      "name": "Get image to Binary",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        500,
+        200
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "byY3kI23lMe4ewnM",
+          "name": "Header Auth account - Maid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-linebot-test",
+        "options": {}
+      },
+      "id": "1f40ba98-3c38-4769-80a5-bbe245b9be28",
+      "name": "Line Chat Bot",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        60,
+        200
+      ],
+      "webhookId": "23ba996d-3242-42a1-946c-f04a680b320a",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Upload image to Google Drive\n",
+        "height": 500,
+        "width": 220,
+        "color": 2
+      },
+      "id": "0842e40c-e4eb-44d0-8b9c-5a7b790e8942",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        660,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## OCR and get value\n**- OCR API by SpaceOCR**\nhttps://api.ocr.space/parse/imageurl?apikey=YOURAPI&language=tha&isOverlayRequired=false&OCREngine=2&filetype=JPG&url=xxx\n\n**- Parse Transaction Details**",
+        "height": 500,
+        "width": 540,
+        "color": 3
+      },
+      "id": "a71519b1-e2c3-4239-ab64-482138a50e6c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Store Data in Google Sheets",
+        "height": 500,
+        "width": 220,
+        "color": 5
+      },
+      "id": "c58f0448-5458-4f20-989c-23fc52d1f6db",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1460,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## LINE Webhook Trigger \n**(Receive Image)**",
+        "height": 500,
+        "width": 220,
+        "color": 5
+      },
+      "id": "077735a7-dc6b-4ce6-8d19-995cf1f9bc52",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Line Chat Bot').item.json.body.events[0].message.id }}.jpg",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://drive.google.com/drive/folders/1M-j_Gt6yKM1K8SISWknaGQyPQn52AaK1"
+        },
+        "options": {}
+      },
+      "id": "f6045ff6-6c5e-4af4-9642-d0add27ff643",
+      "name": "Upload image to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        720,
+        200
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QVrgALkld7whKIgB",
+          "name": "Google Drive account - Peakwave"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1IpvzcnWmb-aLpSleTIF0xoF8xzbOOJQhuT6ITAeEQks/edit?gid=0#gid=0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IpvzcnWmb-aLpSleTIF0xoF8xzbOOJQhuT6ITAeEQks/edit#gid=0",
+          "cachedResultName": "data"
+        },
+        "columns": {
+          "value": {
+            "Fee": "={{ $json.fee }}",
+            "Amount": "={{ $json.amount }}",
+            "Date & Time": "={{ $json.date_time }}",
+            "Sender Name": "={{ $json.sender_name }}",
+            "Receiver Bank": "={{ $json.receiver_bank }}",
+            "Receiver Name": "={{ $json.receiver_name }}",
+            "Sender Account": "={{ $json.sender_account }}",
+            "Transaction ID": "={{ $json.transaction_id }}",
+            "Receiver Account": "={{ $json.receiver_account }}",
+            "Transaction Type": "={{ $json.transaction_type }}"
+          },
+          "schema": [
+            {
+              "id": "Transaction Type",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Transaction Type",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date & Time",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Date & Time",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bank",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Bank",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sender Name",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Sender Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sender Account",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Sender Account",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Receiver Name",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Receiver Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Receiver Bank",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Receiver Bank",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Receiver Account",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Receiver Account",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transaction ID",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Transaction ID",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Amount",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fee",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Fee",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "efeced22-0ab9-42b3-8235-4a664c5934b8",
+      "name": "Record in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1520,
+        200
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0RVWjnYzlWor2bMu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.ocr.space/parse/imageurl?apikey=K82173083188957&language=tha&isOverlayRequired=false&OCREngine=2&filetype=JPG&url={{ \"https://drive.google.com/uc?id=\" + $json[\"id\"] }}\n",
+        "options": {}
+      },
+      "id": "29bbbf46-34ad-4a82-b530-19dfaf95ff22",
+      "name": "Send Image URL to OCR Space for Text Extraction",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        980,
+        200
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json[\"ParsedResults\"][0][\"ParsedText\"];\n\n// Split text by line breaks and trim spaces\nconst lines = text.split(\"\\n\").map(line => line.trim());\n\n// Debugging: Log extracted lines for verification\nconsole.log(\"Extracted Lines:\", lines);\n\n// Helper function to find text after a keyword, with OCR variations\nfunction getValueAfterKeyword(keywords, offset = 1) {\n    let index = lines.findIndex(line => keywords.some(keyword => line.includes(keyword)));\n    return index !== -1 && lines[index + offset] ? lines[index + offset] : null;\n}\n\n// **Extracting Data for Both Standard & PromptPay Transactions**\nconst transaction_type = lines[0] || null;  // First line\nconst date_time = lines[1] || null;  // Second line\n\n// **Sender Details**\nconst sender_name_index = lines.findIndex(line => line.startsWith(\"นาย\"));\nconst sender_name = sender_name_index !== -1 ? lines[sender_name_index] : null;\nconst sender_bank = sender_name_index !== -1 ? lines[sender_name_index + 1] : null;\nconst sender_account = sender_name_index !== -1 ? lines[sender_name_index + 2] : null;\n\n// **Determine if it's a Standard Bank Transfer or PromptPay**\nconst isPromptPay = lines.some(line => line.includes(\"Prompt\") || line.includes(\"รหัสพร้อมเพย์\"));\nlet receiver_name = null;\nlet receiver_bank = null;\nlet receiver_account = null;\n\nif (isPromptPay) {\n    // **Handling PromptPay Transactions**\n    const receiver_index = lines.findIndex(line => line.includes(\"Prompt\"));\n    receiver_bank = \"PromptPay\"; // Fixed for PromptPay transactions\n    receiver_name = receiver_index !== -1 ? lines[receiver_index + 2] : null; // Receiver's actual name\n\n    // **Fix Receiver Account for PromptPay**\n    const receiver_account_index = lines.findIndex(line => line.includes(\"รหัสพร้อมเพย์\"));\n    receiver_account = receiver_account_index !== -1 ? lines[receiver_account_index + 1] : null; // The actual account number\n\n} else {\n    // **Handling Standard Bank Transfers**\n    const receiver_index = lines.findIndex(line => line.includes(\"นิติบุคคล\") || line.includes(\"บริษัท\") || line.includes(\"นาย\"));\n    receiver_name = receiver_index !== -1 ? lines[receiver_index] : null;\n    receiver_bank = receiver_index !== -1 ? lines[receiver_index + 2] : null;\n    receiver_account = receiver_index !== -1 ? lines[receiver_index + 3] : null;\n}\n\n// **Fix Transaction ID Extraction**\nlet transaction_id = null;\n\n// **First, try \"เลขที่รายการ:\" for Standard Transactions**\nconst transaction_index = lines.findIndex(line => line.includes(\"เลขที่รายการ:\"));\nif (transaction_index !== -1) {\n    if (/\\d{10,}/.test(lines[transaction_index])) {\n        // If the same line contains the transaction ID, extract it\n        transaction_id = lines[transaction_index].match(/\\d{10,}/)[0];\n    } else if (transaction_index + 1 < lines.length && /\\d{10,}/.test(lines[transaction_index + 1])) {\n        // If transaction ID is on the next line, extract it\n        transaction_id = lines[transaction_index + 1];\n    }\n}\n\n// ✅ **If transaction_id is still missing, use \"จำนวน:\" or possible OCR errors (\"จำนวนะ\")**\nif (!transaction_id) {\n    let amount_index = lines.findIndex(line => line.includes(\"จำนวน\") || line.includes(\"จำนวนะ\"));\n    if (amount_index !== -1) {\n        for (let i = amount_index + 1; i < lines.length; i++) {\n            if (/^[A-Za-z0-9]+$/.test(lines[i])) { // Ensure it's a valid ID\n                transaction_id = lines[i];\n                break; // **Break early for efficiency**\n            }\n        }\n    }\n}\n\n// **Extract Amount Correctly**\nconst amount_index = lines.findIndex(line => line.includes(\"บาท\") && !line.includes(\"ค่าธรรมเนียม\"));\nconst amount = amount_index !== -1 ? lines[amount_index].replace(\" บาท\", \"\").replace(/[^0-9.]/g, \"\") : null;\n\n// **Extract Fee Correctly**\nconst fee_index = lines.findIndex(line => line.includes(\"ค่าธรรมเนียม\"));\nconst fee = fee_index !== -1 && lines[fee_index + 1] ? lines[fee_index + 1].replace(\" บาท\", \"\").replace(/[^0-9.]/g, \"\") : null;\n\n// **Ensure Essential Details Exist**\nif (transaction_type && date_time && sender_name && sender_bank && sender_account && receiver_name && receiver_bank && receiver_account && transaction_id && amount) {\n    return [\n        {\n            json: {\n                \"transaction_type\": transaction_type,\n                \"date_time\": date_time,\n                \"sender_name\": sender_name,\n                \"sender_bank\": sender_bank,\n                \"sender_account\": sender_account,\n                \"receiver_name\": receiver_name,\n                \"receiver_bank\": receiver_bank,\n                \"receiver_account\": receiver_account,\n                \"transaction_id\": transaction_id,\n                \"amount\": amount,\n                \"fee\": fee\n            }\n        }\n    ];\n} else {\n    return [\n        {\n            json: {\n                \"error\": \"Some values could not be extracted\",\n                \"raw_text\": text\n            }\n        }\n    ];\n}\n"
+      },
+      "id": "ac0d96bc-9e94-4cf8-9334-b99eae85407b",
+      "name": "Extract Transaction Details",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1240,
+        200
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## [ - Google Sheet Link Click !](https://docs.google.com/spreadsheets/d/1IpvzcnWmb-aLpSleTIF0xoF8xzbOOJQhuT6ITAeEQks/edit?usp=sharing)\n\n## [ - Example Slip Click !](https://drive.google.com/file/d/1Ufa17FgdZvX1ep0i0igisQv9X3DA5zYi/view)\n\n![Alt text](https://drive.google.com/thumbnail?id=1MvDrtYSA-w7Ean4MzEbtalEgkFyLN9hb&sz=w1200)",
+        "height": 740,
+        "width": 1320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        520
+      ],
+      "typeVersion": 1,
+      "id": "8e00f953-4e27-4747-800f-2b4e2fe2ac0e",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Line Chat Bot": {
+      "main": [
+        [
+          {
+            "node": "Image slip URL in Line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get image to Binary": {
+      "main": [
+        [
+          {
+            "node": "Upload image to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image slip URL in Line": {
+      "main": [
+        [
+          {
+            "node": "Get image to Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Transaction Details": {
+      "main": [
+        [
+          {
+            "node": "Record in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Send Image URL to OCR Space for Text Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Image URL to OCR Space for Text Extraction": {
+      "main": [
+        [
+          {
+            "node": "Extract Transaction Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "974109da-548e-4525-b5d6-737015b4590e",
+  "meta": {
+    "instanceId": "2c12b0b552404dc07af67cd5f092afd21d18c808d4fdabdb04cb4b064195b6fb"
+  },
+  "id": "YKigamazdRAsDg94",
+  "tags": []
+}

@@ -1,0 +1,347 @@
+{
+  "name": "lesson-08_2_Line_Webhook_and_GoogleDrive",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-linebot-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        40,
+        300
+      ],
+      "webhookId": "90c040f3-04ec-43ff-ab4f-87a7ff380e03",
+      "id": "c72e9cd8-dbf7-4d5d-97e2-994aef315af9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "becb7f33-4404-485b-92e7-e1494da36602",
+              "name": "textinput",
+              "value": "={{ $json.body.events[0].message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        300
+      ],
+      "id": "cdf54611-41dc-4e31-8a95-8dba34aa18ae",
+      "name": "Get Message from Line"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"image\",\n      \"originalContentUrl\": \"{{ $json.webViewLink }}\",\n      \"previewImageUrl\": \"{{ $json.thumbnailLink }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        300
+      ],
+      "id": "52555282-0ea7-4497-a6cf-d4d0ebe1a078",
+      "name": "Reply Image to Line",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "byY3kI23lMe4ewnM",
+          "name": "Header Auth account - Maid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        300
+      ],
+      "id": "ab1dcb02-1235-4818-9201-75d9457b02ae",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('txt2img_OpenAI_gpt-image-1').item.json.created }}",
+        "driveId": {
+          "__rl": true,
+          "value": "1uPS0eEgInZTH4P3fWB9JSlKuioSCYdI_",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1HM5M9IQecWk9aLuUNux_ckq5FvjXkMZs",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        980,
+        300
+      ],
+      "id": "964709f3-a81b-4de9-86e4-e0819ec1bebf",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QVrgALkld7whKIgB",
+          "name": "Google Drive account - Peakwave"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### สร้างภาพด้วย OpenAI\n### Pre-requisites\n1. OpenAI API\n\n### Node: \n- HTTP Requests [Post]\n- Convert to File",
+        "height": 360,
+        "width": 420
+      },
+      "id": "21d37425-e216-47a6-a353-0a1bcd13f304",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### ปรับ input Text จาก Line\n### Pre-requisites\n--\n\n### Node: \n- Edit Fields (Set)",
+        "height": 360,
+        "width": 220,
+        "color": 3
+      },
+      "id": "f97066e7-5326-441e-8ef7-8ab9f8c5f122",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### รับคำสั่งจาก Line\n### Pre-requisites\n1. Line Chatbot\n *<นำ Webhook ไปใส่ใน Line Chatbot>*\n\n### Node: \n- Webhook",
+        "height": 360,
+        "width": 200,
+        "color": 4
+      },
+      "id": "6c3ce963-9dec-4387-a04f-539edd0a3fbe",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### บันทึก รูปภาพลง Google Drive\n### Pre-requisites\n1. Google Credentail\n\n### Node: \n- Google Drive",
+        "height": 360,
+        "width": 260,
+        "color": 5
+      },
+      "id": "322e1a32-7e45-482b-8d0f-d2c5475ca5b3",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### ส่งภาพกลับไปที่ Line\n### Pre-requisites\n1. replyToken\n *<รับมาจาก line message>*\n\n### Node: \n- HTTP Requests [Post]",
+        "height": 360,
+        "width": 260,
+        "color": 4
+      },
+      "id": "ebadc3d9-5f2c-485e-bec0-90d5707498ed",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## [สำหรับการเชื่อมต่อ Line จำเป็นต้องใช้ HTTPS เท่านั้น](https://developers.line.biz/en/docs/messaging-api/ssl-tls-spec-of-the-webhook-source/)\nแนะนำ ควรใช้ n8n.yourdomain หรือ n8n-cloud",
+        "height": 80,
+        "width": 1440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "b2a2417c-f8ac-4185-a8a4-8c5db05e75d8",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-image-1\",\n  \"prompt\": \"{{ $json.textinput }}\",\n  \"n\": 1,\n  \"size\": \"1024x1024\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        300
+      ],
+      "id": "fd0e211f-88eb-4245-8f7d-fa4abf24abb0",
+      "name": "txt2img_OpenAI_gpt-image-1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vxImi0WFlrae4JtI",
+          "name": "Header Auth OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Result\n![Alt text](https://drive.google.com/thumbnail?id=1zGKIUOB_lrT4BfWf5QRY2SFpuCBtfHX3&sz=w500)",
+        "height": 720,
+        "width": 520,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2040,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "fbf6d873-7ab6-4a8a-b5e2-e56491abbe7b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Result\n![Alt text](https://drive.google.com/thumbnail?id=1zHjWPDYo2VnET5wwbgtVECpKI7CHerw6&sz=w500)\n",
+        "height": 720,
+        "width": 520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1500,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "bfcda7c6-f8e6-4653-9a4b-55ea947810ed",
+      "name": "Sticky Note7"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Message from Line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message from Line": {
+      "main": [
+        [
+          {
+            "node": "txt2img_OpenAI_gpt-image-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Reply Image to Line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "txt2img_OpenAI_gpt-image-1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fd130173-260a-4fe7-a400-847213e790e3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c12b0b552404dc07af67cd5f092afd21d18c808d4fdabdb04cb4b064195b6fb"
+  },
+  "id": "n8khYmeMGtUXy7G0",
+  "tags": []
+}

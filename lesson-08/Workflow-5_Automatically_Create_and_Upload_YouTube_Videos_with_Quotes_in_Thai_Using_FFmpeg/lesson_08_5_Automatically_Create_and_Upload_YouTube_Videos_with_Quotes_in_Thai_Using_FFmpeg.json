@@ -1,0 +1,949 @@
+{
+  "name": "lesson-08_5_Automatically Create and Upload YouTube Videos with Quotes in Thai Using FFmpeg",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bf11fbff-81c1-4ca5-9f82-cdb6b475b0ae",
+      "name": "Start AutoClip Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        60,
+        120
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 90817124,
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit#gid=90817124",
+          "cachedResultName": "video_backgroud_list"
+        },
+        "columns": {
+          "value": {
+            "BackgroundURL": "={{ $json.webViewLink }}"
+          },
+          "schema": [
+            {
+              "id": "BackgroundURL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "BackgroundURL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BackgroudStatus",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "BackgroudStatus",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b399e1d6-44bb-4576-a782-0a740aff4bc4",
+      "name": "Retrieve Video Background Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        520,
+        300
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit#gid=0",
+          "cachedResultName": "Quotes_status"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "CreateStatus"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ebcd1ff6-77e6-4cdf-b5ee-b70bd2c80a91",
+      "name": "Retrieve Quote Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        520,
+        120
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1mLOqFJZvUm563mJ7LvTsIcKrAoakX-h2"
+          }
+        },
+        "options": {
+          "fields": [
+            "webViewLink",
+            "id",
+            "name"
+          ]
+        }
+      },
+      "id": "640f2ea6-1692-4812-a11d-b0ebd48c8cf2",
+      "name": "List Video Background Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        280,
+        300
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8feZJqTYPdpJ4pnc",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "19727718-f70d-4333-93dd-1ade2b1a66bf",
+              "name": "MusicBackgroundFolderID",
+              "type": "string",
+              "value": "12T6ABEuR7WlZ2i88GqcB3U4DmuKVM4iR"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dc282261-3955-4747-aa50-5a8be4fe1993",
+      "name": "Configure Music Background Folder ID",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        60,
+        480
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "=12T6ABEuR7WlZ2i88GqcB3U4DmuKVM4iR"
+          }
+        },
+        "options": {
+          "fields": [
+            "webViewLink",
+            "name",
+            "id"
+          ]
+        }
+      },
+      "id": "e06b1271-1b7a-4dba-bc2e-4c33fb897b8c",
+      "name": "List Music Background Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        280,
+        480
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8feZJqTYPdpJ4pnc",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1264732774,
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit#gid=1264732774",
+          "cachedResultName": "music_backgroud_list"
+        },
+        "columns": {
+          "value": {
+            "MusicURL": "={{ $json.webViewLink }}"
+          },
+          "schema": [
+            {
+              "id": "MusicURL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "MusicURL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MusicStatus",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "MusicStatus",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8eb40364-ca43-42db-bb8f-96ee73585bc9",
+      "name": "Retrieve Music Background Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        520,
+        480
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "1690c596-846d-46e1-80f5-a876264271c7",
+      "name": "Merge File Selection Data",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        760,
+        320
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "jsCode": "function getRandomItem(arr) {\n  return arr[Math.floor(Math.random() * arr.length)];\n}\n\n// Filter items based on unique keys from the merged inputs\nconst videoItems = items.filter(item => item.json.BackgroundURL !== undefined);\nconst musicItems = items.filter(item => item.json.MusicURL !== undefined);\nconst quoteItems = items.filter(item => item.json.Qoute !== undefined);\n\n// Debug logs to check counts in the execution log\nconsole.log(\"Video Items count: \" + videoItems.length);\nconsole.log(\"Music Items count: \" + musicItems.length);\nconsole.log(\"Quote Items count: \" + quoteItems.length);\n\nif (videoItems.length === 0 || musicItems.length === 0 || quoteItems.length === 0) {\n  throw new Error(\"One or more input arrays are empty. Check your previous nodes.\");\n}\n\nconst selectedVideo = getRandomItem(videoItems);\nconst selectedMusic = getRandomItem(musicItems);\nconst selectedQuote = getRandomItem(quoteItems);\n\n// Return the combined selected items\nreturn [{\n  video: selectedVideo.json,\n  music: selectedMusic.json,\n  quote: selectedQuote.json\n}];\n"
+      },
+      "id": "0dd1b423-6009-4033-af26-b261a0a4f07b",
+      "name": "Select Random Video, Music & Quote",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        960,
+        320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Data Preparation & File Selection\nRetrieve and merge source data for quotes, video backgrounds, and music from Google Sheets and Google Drive; then randomly select one quote, one background video, and one music file.",
+        "height": 660,
+        "width": 1100
+      },
+      "id": "1bb29aac-e118-4495-9b00-5e6c58b73d07",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.video.BackgroundURL }}",
+          "mode": "url"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "359a6b39-41d1-4941-ba64-a07792bf97c9",
+      "name": "Download Selected Video Background",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1200,
+        120
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8feZJqTYPdpJ4pnc",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.music.MusicURL }}",
+          "mode": "url"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "26b74d18-741a-4297-b102-4882e057bb77",
+      "name": "Download Selected Music Background",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1200,
+        460
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8feZJqTYPdpJ4pnc",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/data/video1.mp4",
+        "options": {}
+      },
+      "id": "408cb6e2-d840-4c9f-a246-fd2fe922fc74",
+      "name": "Save Video Background Locally",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        1440,
+        120
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/data/music1.mp3",
+        "options": {}
+      },
+      "id": "e4df0490-d657-4b19-9b12-0095d5fe3859",
+      "name": "Save Music Background Locally",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        1440,
+        460
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define separate configuration for the quote and the author\nconst quoteFont = \"Kanit-Italic.ttf\";      // Font for the quote\nconst quoteFontSize = 70;\nconst authorFont = \"Kanit-Italic.ttf\";         // Font for the author (ensure this supports Thai)\nconst authorFontSize = 50;\nconst fontColor = \"white\";\nconst lineHeightMultiplier = 1.1;\nconst videoWidth = 1080;\nconst margin = 40;  // Gap from left and right edges\n\n// Effective width for the quote text (accounting for left/right margins)\nconst effectiveVideoWidth = videoWidth - 2 * margin;\n\n// Estimate average character width based on quoteFontSize (this is a rough estimate)\nconst avgCharWidth = quoteFontSize * 0.6;\nconst maxCharsPerLine = Math.floor(effectiveVideoWidth / avgCharWidth);\n\n// Retrieve the quote transcript and author from the \"Merge\" node\nconst transcript = $node[\"Merge File Selection Data\"].json[\"Qoute\"];\nif (!transcript) {\n  throw new Error(\"Quote not found\");\n}\nconst author = $node[\"Merge File Selection Data\"].json[\"Author\"];\nif (!author) {\n  throw new Error(\"Author not found\");\n}\n\n// Split the transcript into words and group them into lines based on maxCharsPerLine\nconst words = transcript.split(' ');\nconst lines = [];\nlet currentLine = \"\";\nlet currentCharCount = 0;\n\nwords.forEach(word => {\n  const wordLength = word.length;\n  const additionalSpace = currentLine ? 1 : 0;\n  const potentialLength = currentCharCount + additionalSpace + wordLength;\n  if (potentialLength <= maxCharsPerLine) {\n    currentLine += (currentLine ? \" \" : \"\") + word;\n    currentCharCount = potentialLength;\n  } else {\n    lines.push(currentLine);\n    currentLine = word;\n    currentCharCount = wordLength;\n  }\n});\nif (currentLine) {\n  lines.push(currentLine);\n}\n\n// Calculate layout for the quote block\nconst lineHeight = quoteFontSize * lineHeightMultiplier;\nconst totalHeight = lines.length * lineHeight;\n\n// Build drawtext commands for each quote line (centered horizontally)\n// Each line is positioned so that the entire quote block is vertically centered.\nconst quoteCommands = lines.map((line, index) => {\n  // Escape any single quotes in the line\n  const escapedLine = line.replace(/'/g, \"\\\\'\");\n  return `drawtext=fontfile=${quoteFont}:text='${escapedLine}':fontsize=${quoteFontSize}:fontcolor=${fontColor}:x=(w-text_w)/2:y=((h-${totalHeight})/2)+(${index}*${lineHeight})`;\n});\n\n// Build the drawtext command for the author\n// Place the author text below the quote block with a small gap (e.g. 20 pixels)\n// Align it to the right by setting x = w - text_w - margin.\nconst authorY = `((h-${totalHeight})/2)+(${lines.length}*${lineHeight})+20`;\nconst escapedAuthor = author.replace(/'/g, \"\\\\'\");\nconst authorCommand = `drawtext=fontfile=${authorFont}:text='${escapedAuthor}':fontsize=${authorFontSize}:fontcolor=${fontColor}:x=w-text_w-${margin}:y=${authorY}`;\n\n// Combine all commands (separated by commas) into one drawtext filter string.\nconst fullDrawTextFilter = quoteCommands.concat(authorCommand).join(\", \");\n\n// Return the prepared filter string for insertion into your FFmpeg command.\nreturn {\n  json: {\n    drawText: fullDrawTextFilter\n  }\n};\n"
+      },
+      "id": "c58dd005-795e-46ad-a5fc-b5be8ffe597c",
+      "name": "Prepare Overlay Text (Quote & Author)",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1640,
+        140
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i {{ $('Save Video Background Locally').item.json.fileName }} -i {{ $('Save Music Background Locally').item.json.fileName }} -filter_complex \"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[vid]; color=black@0.3:size=1080x1920:d=10[bg]; [vid][bg]overlay=shortest=1[bgvid]; [bgvid]{{ $json.drawText }}[outv]; [1:a]volume=0.8[aout]\" -map \"[outv]\" -map \"[aout]\" -aspect 9:16 -c:v libx264 -c:a aac -shortest output.mp4 -y"
+      },
+      "id": "17d13f11-bb51-4335-b868-2df4dd2a3b63",
+      "name": "Generate Final Video Clip",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [
+        1660,
+        460
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## File Download & Video Processing\nDownload the selected files, write them to disk, prepare overlay text (quote and author), and generate the final video clip using FFmpeg.",
+        "height": 660,
+        "width": 700,
+        "color": 3
+      },
+      "id": "d5f1329d-77db-41d6-be7b-5c6aa70aa595",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status&uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "video/webm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "RAW/JSON",
+        "body": "={\n  \"snippet\": {\n    \"title\": \"{{ $('Save Music Background Locally').item.json.quote.Qoute }}\",\n    \"description\": \"{{ $('Save Music Background Locally').item.json.quote.Qoute }}\\n{{ $('Save Music Background Locally').item.json.quote.Author }}\",\n    \"defaultLanguage\": \"en\",\n    \"defaultAudioLanguage\": \"en\"\n  },\n  \"status\": {\n    \"privacyStatus\": \"public\",\n    \"license\": \"youtube\",\n    \"embeddable\": true,\n    \"publicStatsViewable\": true,\n    \"madeForKids\": false\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "8d57f906-a930-484d-80c6-7d18e34eb3c1",
+      "name": "Initiate YouTube Resumable Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1880,
+        140
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "hQ3NFBCaMd158sL7",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "=output.mp4",
+        "options": {}
+      },
+      "id": "5bb1405c-3b75-48dd-a809-95c97915f7c0",
+      "name": "Read output file",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        2080,
+        140
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Initiate YouTube Resumable Upload').item.json.headers.location }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "video/webm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "0b8a3624-a2fd-4564-8b8f-a4f5793c54c0",
+      "name": "Upload Video to YouTube",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2280,
+        140
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "hQ3NFBCaMd158sL7",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit#gid=0",
+          "cachedResultName": "Quotes_status"
+        },
+        "columns": {
+          "value": {
+            "Index": "={{ $('Save Music Background Locally').item.json.quote.Index }}",
+            "YoutubeURL": "=https://www.youtube.com/watch?v={{ $json.id }}",
+            "CreateStatus": "DONE"
+          },
+          "schema": [
+            {
+              "id": "Index",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Index",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Qoute",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Qoute",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Author",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Author",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreateStatus",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "CreateStatus",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "YoutubeURL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "YoutubeURL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Index"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2167b39b-ed7e-4070-9835-d4bcf564a5ac",
+      "name": "Update Quote Upload Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1880,
+        460
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit?gid=0#gid=0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 90817124,
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit#gid=90817124",
+          "cachedResultName": "video_backgroud_list"
+        },
+        "columns": {
+          "value": {
+            "BackgroundURL": "{{ $('Read/Write Files from Disk1').item.json.video.BackgroundURL }}",
+            "BackgroudStatus": "DONE"
+          },
+          "schema": [
+            {
+              "id": "BackgroundURL",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "BackgroundURL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BackgroudStatus",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "BackgroudStatus",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "BackgroundURL"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "495365f1-27c6-4b74-a039-a72c900bc127",
+      "name": "Mark Background as Used",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2260,
+        460
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vGgNeKZQfZqiZQyH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Video Upload & Post-Processing\nUpload the final video to YouTube using the YouTube API and update your Google Sheets with upload statuses and YouTube links.",
+        "height": 660,
+        "width": 620
+      },
+      "id": "5b9421dd-5d3c-4929-a971-291f718a0d10",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1840,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## [ - Google Sheet Link Click !](https://docs.google.com/spreadsheets/d/184-zcrfWSzQpDa-t57Oo_8DLyAF-2B_6yvGrybrcd5I/edit?usp=sharing)\n\n## [ - Google Drive Example Click !](https://drive.google.com/drive/folders/1FToPtZEIjBwRKbrKvhwxSdhdUHzgls0C?usp=sharing)\n\n![Alt text](https://drive.google.com/thumbnail?id=1Df9Ir5l7L_ORbZhclIUHD4Ge4RgbZslO&sz=w1200)",
+        "height": 740,
+        "width": 1260,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        680
+      ],
+      "typeVersion": 1,
+      "id": "d4f8f99e-0efb-467b-a8c4-a61ba4a04fd5",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Read output file": {
+      "main": [
+        [
+          {
+            "node": "Upload Video to YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Quote Data": {
+      "main": [
+        [
+          {
+            "node": "Merge File Selection Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start AutoClip Workflow": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Quote Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List Video Background Files",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Configure Music Background Folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Video to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Update Quote Upload Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Final Video Clip": {
+      "main": [
+        [
+          {
+            "node": "Initiate YouTube Resumable Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge File Selection Data": {
+      "main": [
+        [
+          {
+            "node": "Select Random Video, Music & Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Quote Upload Status": {
+      "main": [
+        [
+          {
+            "node": "Mark Background as Used",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Music Background Files": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Music Background Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Video Background Files": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Video Background Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Music Background Locally": {
+      "main": [
+        [
+          {
+            "node": "Prepare Overlay Text (Quote & Author)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Video Background Locally": {
+      "main": [
+        [
+          {
+            "node": "Download Selected Music Background",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Music Background Data": {
+      "main": [
+        [
+          {
+            "node": "Merge File Selection Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Retrieve Video Background Data": {
+      "main": [
+        [
+          {
+            "node": "Merge File Selection Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Initiate YouTube Resumable Upload": {
+      "main": [
+        [
+          {
+            "node": "Read output file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Selected Music Background": {
+      "main": [
+        [
+          {
+            "node": "Save Music Background Locally",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Selected Video Background": {
+      "main": [
+        [
+          {
+            "node": "Save Video Background Locally",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Random Video, Music & Quote": {
+      "main": [
+        [
+          {
+            "node": "Download Selected Video Background",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure Music Background Folder ID": {
+      "main": [
+        [
+          {
+            "node": "List Music Background Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Overlay Text (Quote & Author)": {
+      "main": [
+        [
+          {
+            "node": "Generate Final Video Clip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5af2e433-6e40-42e4-a11f-c666cff27c8f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dec2dfaf70ee5f196c1183021cac4584d3e5f289775f85e6eb54a94f68f11d9e"
+  },
+  "id": "eW0NGZLjywxZynNE",
+  "tags": []
+}
